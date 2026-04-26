@@ -1,11 +1,11 @@
 # VaultSign - Cofre Inteligente com ESP32
 
-## Identificação do Candidato
+## 👤 Identificação do Candidato
 
 - **Nome completo:** Thiago Nerton Macedo Alves
 - **GitHub:** https://github.com/Nertonm/processoseletivoIoT
 
-## Visão Geral
+## 1️⃣ Visão Geral da Solução
 
 VaultSign é um cofre inteligente simulado em ESP32/MicroPython. O firmware
 recebe dígitos pela Serial, valida um PIN de 4 dígitos e controla os
@@ -19,7 +19,7 @@ ou colocado em lockout.
 
 ![Diagrama do VaultSign](images/diagram.png)
 
-## Situação-Problema
+### Situação-Problema
 
 Cofres residenciais convencionais não registram tentativas de acesso, não
 alertam sobre falhas consecutivas e não oferecem auditoria. Uma vez violados,
@@ -32,7 +32,7 @@ consecutivas e registro dos eventos no monitor serial. A arquitetura também
 deixa espaço para envio dessas ocorrências a um endpoint externo, permitindo
 auditoria remota e rastreabilidade.
 
-## Como Testar no Wokwi
+### Como Testar no Wokwi
 
 1. Abra o projeto no Wokwi usando `diagram.json` e `wokwi.toml`.
 2. Inicie a simulação.
@@ -44,7 +44,9 @@ Durante a execução, o firmware imprime `VaultSign iniciado.` no boot, mostra
 mensagens no LCD, mascara o PIN nos logs e atualiza os sinais visuais conforme
 o estado do cofre.
 
-## Fluxo Principal
+## 2️⃣ Arquitetura do Sistema Embarcado
+
+### Fluxo Principal
 
 O loop principal do firmware executa continuamente cinco etapas:
 
@@ -57,7 +59,7 @@ O loop principal do firmware executa continuamente cinco etapas:
 Esse desenho mantém o firmware responsivo enquanto aguarda entrada do usuário,
 pisca LEDs, atualiza o lockout e verifica os botões físicos.
 
-## Estrutura do Repositório
+### Estrutura do Repositório
 
 | Caminho | Descrição |
 |---|---|
@@ -74,7 +76,7 @@ pisca LEDs, atualiza o lockout e verifica os botões físicos.
 | `Dockerfile` | Geração do filesystem MicroPython (`fs.bin`) |
 | `.github/workflows/ci.yml` | Pipeline de build e simulação |
 
-## Arquitetura do Firmware
+### Arquitetura do Firmware
 
 O firmware foi dividido em módulos pequenos, cada um com uma responsabilidade
 clara. `main.py` apenas inicializa os componentes e executa o loop. A lógica de
@@ -90,7 +92,37 @@ chama métodos de alto nível, como `sinalizar_acesso_ok()`, `mostrar_lockout()`
 e `fechar_servo()`. Essa separação deixa o comportamento do cofre mais fácil de
 ler, testar e adaptar.
 
-## Hardware Utilizado
+### Máquina de Estados
+
+| Estado | Condição | Comportamento |
+|---|---|---|
+| `AGUARDANDO` | Buffer vazio ou retorno de outro estado | Servo fechado, relé desligado, LCD `Aguardando PIN`, LED amarelo piscando |
+| `DIGITANDO` | Primeiro dígito válido recebido | LED amarelo aceso, LCD com asteriscos, buffer em memória |
+| `VALIDANDO` | Buffer atinge 4 dígitos | LCD `Validando...`, comparação com `PIN_CADASTRADO` |
+| `ACESSO_OK` | PIN correto | Servo abre, LED verde acende, relé liga `LOCK` por 3 s, tentativas zeradas |
+| `BLOQUEADO` | PIN incorreto, ainda com tentativas restantes | LED vermelho, buzzer, LCD `PIN INVALIDO` e `Tent N/3`, retorno após 800 ms |
+| `LOCKOUT` | Terceira falha consecutiva | LED vermelho, buzzer, LCD com contagem regressiva de 10 s, entradas ignoradas |
+
+### Integração com o Módulo de IA
+
+Neste repositório, o ESP32 não executa o modelo de IA. Ele recebe pela Serial o
+dígito que já foi reconhecido pelo módulo externo. Na simulação do Wokwi, essa
+entrada chega ao MicroPython por `sys.stdin`.
+
+O `SerialInputHandler` faz o tratamento necessário antes de entregar o dado para
+a máquina de estados: remove espaços e quebras de linha, aceita apenas
+caracteres de `0` a `9` e monta o PIN até completar `TAMANHO_PIN = 4`. Com o
+buffer completo, a `VaultSignStateMachine` entra em `VALIDANDO` e compara o
+valor recebido com o PIN cadastrado.
+
+Se futuramente a inferência rodar no próprio ESP32, a troca fica concentrada na
+origem da entrada. Em vez de ler da Serial, o firmware chamaria um módulo local
+de inferência. Para a máquina de estados, a interface continuaria igual: receber
+um dígito por vez e decidir o acesso.
+
+## 3️⃣ Componentes Utilizados na Simulação
+
+### Hardware Utilizado
 
 | Função | Componente | GPIO | Papel |
 |---|---|---|---|
@@ -112,35 +144,7 @@ ler, testar e adaptar.
 | Logic analyzer | `logic` | D0 a D4 | Observa sinais principais na simulação |
 | Motor visual | `motor` | Sem acionamento | Identifica visualmente a fechadura |
 
-## Máquina de Estados
-
-| Estado | Condição | Comportamento |
-|---|---|---|
-| `AGUARDANDO` | Buffer vazio ou retorno de outro estado | Servo fechado, relé desligado, LCD `Aguardando PIN`, LED amarelo piscando |
-| `DIGITANDO` | Primeiro dígito válido recebido | LED amarelo aceso, LCD com asteriscos, buffer em memória |
-| `VALIDANDO` | Buffer atinge 4 dígitos | LCD `Validando...`, comparação com `PIN_CADASTRADO` |
-| `ACESSO_OK` | PIN correto | Servo abre, LED verde acende, relé liga `LOCK` por 3 s, tentativas zeradas |
-| `BLOQUEADO` | PIN incorreto, ainda com tentativas restantes | LED vermelho, buzzer, LCD `PIN INVALIDO` e `Tent N/3`, retorno após 800 ms |
-| `LOCKOUT` | Terceira falha consecutiva | LED vermelho, buzzer, LCD com contagem regressiva de 10 s, entradas ignoradas |
-
-## Integração com o Módulo de IA
-
-Neste repositório, o ESP32 não executa o modelo de IA. Ele recebe pela Serial o
-dígito que já foi reconhecido pelo módulo externo. Na simulação do Wokwi, essa
-entrada chega ao MicroPython por `sys.stdin`.
-
-O `SerialInputHandler` faz o tratamento necessário antes de entregar o dado para
-a máquina de estados: remove espaços e quebras de linha, aceita apenas
-caracteres de `0` a `9` e monta o PIN até completar `TAMANHO_PIN = 4`. Com o
-buffer completo, a `VaultSignStateMachine` entra em `VALIDANDO` e compara o
-valor recebido com o PIN cadastrado.
-
-Se futuramente a inferência rodar no próprio ESP32, a troca fica concentrada na
-origem da entrada. Em vez de ler da Serial, o firmware chamaria um módulo local
-de inferência. Para a máquina de estados, a interface continuaria igual: receber
-um dígito por vez e decidir o acesso.
-
-## Decisões Técnicas
+## 4️⃣ Decisões Técnicas Relevantes
 
 ### Firmware modular
 
@@ -196,9 +200,9 @@ do acionamento do contato.
 
 O botão de reset usa GPIO35 e chama `machine.reset()`. O pino `EN` não funcionou
 como esperado no Wokwi, então o reset por software foi adotado para reiniciar o
-firmware e imprimir novamente `VaultSign iniciado.`.
+firmware.
 
-## Resultados Obtidos
+## 5️⃣ Resultados Obtidos
 
 O fluxo completo do cofre está implementado:
 
@@ -215,7 +219,9 @@ O fluxo completo do cofre está implementado:
 O volume do buzzer segue o potenciômetro em GPIO34. O botão de auto-teste
 percorre os periféricos principais. O botão de reset reinicia o firmware.
 
-## Limitações
+## 6️⃣ Comentários Adicionais 
+
+### Limitações
 
 Limitações assumidas nesta entrega:
 
