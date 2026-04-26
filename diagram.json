@@ -1,7 +1,305 @@
 {
   "version": 1,
-  "author": "Uri Shaked",
+  "author": "VaultSign",
   "editor": "wokwi",
-  "parts": [ { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} } ],
-  "connections": [ [ "esp:TX", "$serialMonitor:RX", "", [] ], [ "esp:RX", "$serialMonitor:TX", "", [] ] ]
+  "parts": [
+    {
+      "type": "wokwi-dc-motor",
+      "id": "motor",
+      "top": 0,
+      "left": 0,
+      "attrs": { "label": "Fechadura" }
+    },
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp1",
+      "top": 1092.74,
+      "left": 771.7,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_verm1",
+      "top": 966,
+      "left": 762.2,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_verde1",
+      "top": 985.2,
+      "left": 800.6,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_amar1",
+      "top": 1014,
+      "left": 906.2,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_verm2",
+      "top": 1060.8,
+      "left": 757.85,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_verm3",
+      "top": 1060.8,
+      "left": 796.25,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_verm4",
+      "top": 1080,
+      "left": 901.85,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_pwr1",
+      "top": 1042.8,
+      "left": 954.2,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 1010.4,
+      "left": 702.6,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay1",
+      "top": 857.4,
+      "left": 742.8,
+      "rotate": 270,
+      "attrs": { "transistor": "npn" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_test1",
+      "top": 1017,
+      "left": 847.8,
+      "rotate": 90,
+      "attrs": { "color": "red", "xray": "" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_rst1",
+      "top": 1257.2,
+      "left": 947.6,
+      "rotate": 270,
+      "attrs": { "color": "black" }
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 1340.8,
+      "left": 735.2,
+      "attrs": { "pins": "i2c", "address": "0x27" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot1",
+      "top": 1161.4,
+      "left": 990.9,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 944.75,
+      "left": 864,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_test",
+      "top": 944.75,
+      "left": 912,
+      "rotate": 90,
+      "attrs": { "value": "10000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_rst",
+      "top": 1250,
+      "left": 900,
+      "rotate": 90,
+      "attrs": { "value": "10000" }
+    },
+    { "type": "wokwi-servo", "id": "servo1", "top": 718, "left": 912, "attrs": {} },
+    {
+      "type": "wokwi-text",
+      "id": "color_note",
+      "top": 680,
+      "left": 660,
+      "attrs": {
+        "text": "Cores: vermelho=VCC/VIN, preto=GND, roxo=controle fechadura, azul/amarelo=I2C",
+        "fontSize": "8",
+        "color": "#cccccc"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "btn_note",
+      "top": 979.2,
+      "left": 835.2,
+      "attrs": {
+        "text": "Botao teste: R10K pull-up para 3V3; pressionado = LOW no GPIO33",
+        "fontSize": "8",
+        "color": "#cccccc"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "rst_note",
+      "top": 1210,
+      "left": 870,
+      "attrs": {
+        "text": "Botao reset: R10K pull-up para 3V3; pressionado = LOW no GPIO35",
+        "fontSize": "8",
+        "color": "#cccccc"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "relay_note",
+      "top": 777.6,
+      "left": 508.8,
+      "attrs": { "text": "Rele NPN: GPIO26 HIGH fecha COM -> NO", "fontSize": "8", "color": "#9933cc" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "lock_load_lbl",
+      "top": 748.8,
+      "left": 1104,
+      "attrs": { "text": "Carga visual LOCK\nvia contato NO", "fontSize": "8", "color": "#9933cc" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "res_load",
+      "top": 840,
+      "left": 1065.05,
+      "rotate": 90,
+      "attrs": { "value": "330" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_load",
+      "top": 918,
+      "left": 1059.8,
+      "attrs": { "color": "white", "lightColor": "purple", "label": "LOCK" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "cap_lbl",
+      "top": 844.8,
+      "left": 988.8,
+      "attrs": { "text": "Cap 100nF\nVIN/GND", "fontSize": "8", "color": "#ff6666" }
+    },
+    {
+      "type": "wokwi-capacitor",
+      "id": "cap_rele",
+      "top": 900,
+      "left": 950,
+      "attrs": { "capacitance": "0.0000001", "label": "100nF" }
+    },
+    {
+      "type": "wokwi-diode",
+      "id": "flyback",
+      "top": 1080,
+      "left": 1060,
+      "rotate": 90,
+      "attrs": { "label": "1N4007" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "logic_lbl",
+      "top": 1622.4,
+      "left": 595.2,
+      "attrs": {
+        "text": "Logic Analyzer: D0=GPIO26 D1=GPIO27 D2=GPIO32 D3=GPIO13 D4=GPIO25",
+        "fontSize": "8",
+        "color": "#777777"
+      }
+    },
+    {
+      "type": "wokwi-logic-analyzer",
+      "id": "logic",
+      "top": 1480,
+      "left": 650,
+      "attrs": { "channelNames": "FECH,VERM,AMAR,BUZZ,VERDE,D5,D6,D7" }
+    }
+  ],
+  "connections": [
+    [ "esp1:TX", "$serialMonitor:RX", "#777777", [ "v-1" ] ],
+    [ "esp1:RX", "$serialMonitor:TX", "#777777", [ "v-1" ] ],
+    [ "led_amar1:A", "res_verm4:1", "#d6b400", [ "v0" ] ],
+    [ "led_verde1:A", "res_verm3:1", "#22bb22", [ "v0" ] ],
+    [ "led_verm1:A", "res_verm2:1", "#ff3333", [ "v0" ] ],
+    [ "esp1:GND.1", "led_verm1:C", "black", [ "v0" ] ],
+    [ "esp1:GND.1", "led_verde1:C", "black", [ "v-19.05", "h38.4" ] ],
+    [ "esp1:GND.1", "led_amar1:C", "black", [ "v-19.05", "h57.6" ] ],
+    [ "esp1:32", "res_verm4:2", "#d6b400", [ "v-9.45", "h9.6" ] ],
+    [ "esp1:27", "res_verm2:2", "#ff3333", [ "v-9.45", "h-19.2" ] ],
+    [ "esp1:25", "res_verm3:2", "#22bb22", [ "v0" ] ],
+    [ "bz1:2", "esp1:GND.1", "black", [ "v0", "h28.4", "v28.8", "h9.6" ] ],
+    [ "bz1:1", "esp1:13", "#ff9900", [ "v9.6", "h28.8", "v28.8", "h9.6" ] ],
+    [ "led_pwr1:A", "esp1:3V3", "#ff3333", [ "v0" ] ],
+    [ "led_pwr1:C", "esp1:GND.1", "black", [ "v48", "h-114.8" ] ],
+    [ "btn_test1:2.r", "esp1:GND.1", "black", [ "v48.2", "h-96" ] ],
+    [ "esp1:3V3", "res_test:1", "#ff3333", [ "v-48", "h96" ] ],
+    [ "res_test:2", "btn_test1:1.l", "#ff3333", [ "v28.8", "h-48" ] ],
+    [ "btn_test1:1.l", "esp1:33", "#ff9900", [ "v-9.6", "h-57.6", "v153.45" ] ],
+    [ "esp1:3V3", "res_rst:1", "#ff3333", [ "v-24", "h72" ] ],
+    [ "res_rst:2", "esp1:35", "#999999", [ "v24", "h-72" ] ],
+    [ "esp1:35", "btn_rst1:1.l", "#999999", [ "v-28.65", "h48", "v144" ] ],
+    [ "btn_rst1:2.r", "esp1:GND.2", "black", [ "v0" ] ],
+    [ "esp1:21", "lcd1:SDA", "#4488ff", [ "v76.8", "h-163.2", "v67.2" ] ],
+    [ "esp1:22", "lcd1:SCL", "#ffcc00", [ "v67.2", "h-201.6", "v86.4" ] ],
+    [ "esp1:3V3", "lcd1:VCC", "#ff3333", [ "v0.15", "h28.8", "v182.4", "h-230.4", "v48" ] ],
+    [ "lcd1:GND", "esp1:GND.2", "black", [ "h-28.8", "v-28.8", "h192" ] ],
+    [ "esp1:GND.2", "pot1:GND", "black", [ "h67.2", "v-57.6" ] ],
+    [ "pot1:VCC", "esp1:3V3", "#ff3333", [ "h-38.4", "v-58.4" ] ],
+    [ "esp1:34", "pot1:SIG", "#cc66ff", [ "v-9.45", "h115.2", "v57.6" ] ],
+    [ "esp1:GND.1", "relay1:GND", "black", [ "v-19.05", "h19.2", "v-163.2", "h9.6" ] ],
+    [ "relay1:VCC", "esp1:3V3", "#ff3333", [ "v9.6", "h48", "v153.6", "h28.8" ] ],
+    [ "r1:1", "relay1:IN", "#9933cc", [ "v0" ] ],
+    [ "r1:2", "esp1:26", "#9933cc", [ "v28.8", "h-116.4" ] ],
+    [ "servo1:V+", "esp1:VIN", "#ff3333", [ "h-57.6", "v134.5", "h-9.6", "v192", "h28.8" ] ],
+    [
+      "servo1:GND",
+      "esp1:GND.2",
+      "black",
+      [ "h-19.2", "v153.6", "h57.6", "v96", "v96", "v134.4" ]
+    ],
+    [ "servo1:PWM", "esp1:14", "#ff9900", [] ],
+    [ "esp1:3V3", "relay1:COM", "#ff3333", [ "h-28.8", "v-134.4", "h39.8" ] ],
+    [ "relay1:NO", "res_load:1", "#ff9900", [] ],
+    [ "res_load:2", "led_load:A", "#9933cc", [ "v-1" ] ],
+    [ "led_load:C", "relay1:GND", "black", [ "v120", "h-300", "v-220" ] ],
+    [ "esp1:3V3", "cap_rele:1", "#ff3333", [ "h180" ] ],
+    [ "relay1:GND", "cap_rele:2", "black", [ "h180" ] ],
+    [ "relay1:NO", "flyback:C", "#ff9900", [ "h300", "v180" ] ],
+    [ "led_load:C", "flyback:A", "black", [ "h40", "v130" ] ],
+    [ "esp1:26", "logic:D0", "#9933cc", [ "v-38.25", "h259.2", "v458.25", "h-470.4", "v-82.6" ] ],
+    [ "esp1:27", "logic:D1", "#ff3333", [ "v-9.45", "h297.6", "v449.45", "h-508.8", "v-93" ] ],
+    [ "esp1:32", "logic:D2", "#d6b400", [ "v-9.45", "h240", "v469.45", "h-499.2", "v-103.4" ] ],
+    [ "esp1:13", "logic:D3", "#ff9900", [ "v-19.05", "h-192", "v384", "h74" ] ],
+    [ "esp1:25", "logic:D4", "#22bb22", [ "v-19.05", "h268.8", "v519.05", "h-518.4", "v-124.2" ] ],
+    [ "esp1:GND.2", "logic:GND", "black", [ "h163.2", "v336", "h-441.6", "v-17.95" ] ]
+  ],
+  "dependencies": {}
 }
