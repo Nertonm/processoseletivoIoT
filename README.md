@@ -231,6 +231,7 @@ Limitações assumidas nesta entrega:
 - **Reset por software:** depende do loop principal estar ativo.
 - **Sem persistência segura, criptografia ou telemetria externa.**
 
+
 Para uma versão de produção, os próximos passos seriam adicionar armazenamento
 seguro do PIN, watchdog, tratamento de falha de energia, auto-teste não
 bloqueante, telemetria autenticada e testes da máquina de estados.
